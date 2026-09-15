@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,7 +21,8 @@ type Document = {
 export default function Home() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(false);
-  const currentUserId = 2; // hardcoded as Alice for now — replaced by real selector in step 7
+
+  const currentUserId = 2;
 
   async function loadDocuments() {
     const res = await fetch(`/api/documents?userId=${currentUserId}`);
@@ -30,7 +32,8 @@ export default function Home() {
 
   async function createDocument() {
     setLoading(true);
-    const res = await fetch("/api/documents", {
+
+    await fetch("/api/documents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -38,6 +41,7 @@ export default function Home() {
         title: "Untitled Document"
       })
     });
+
     await loadDocuments();
     setLoading(false);
   }
@@ -47,35 +51,67 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold">My Documents</h1>
-        <Button onClick={createDocument} disabled={loading}>
-          {loading ? "Creating..." : "Create Document"}
-        </Button>
-      </div>
+    <main className="min-h-screen">
+      <div className="mx-auto max-w-5xl px-6 py-10 lg:px-8 lg:py-14">
+        {/* Header */}
+        <header className="mb-10 flex items-end justify-between gap-6">
+          <div>
+            <p className="mb-2 text-sm text-muted-foreground">Workspace</p>
+            <h1 className="text-3xl font-semibold tracking-tight">Documents</h1>
+          </div>
 
-      {documents.length === 0 ? (
-        <p className="text-muted-foreground">
-          No documents yet. Create one to get started.
-        </p>
-      ) : (
-        <div className="grid gap-3">
-          {documents.map((doc) => (
-            <Link key={doc.id} href={`/documents/${doc.id}`}>
-              <Card className="cursor-pointer hover:bg-accent transition-colors">
-                <CardHeader>
-                  <CardTitle>{doc.title}</CardTitle>
-                  <CardDescription>
-                    Owned by {doc.owner_name} · Last updated{" "}
-                    {new Date(doc.updated_at).toLocaleString()}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
+          <Button onClick={createDocument} disabled={loading}>
+            {loading ? "Creating..." : "New document"}
+          </Button>
+        </header>
+
+        {/* Documents */}
+        {documents.length === 0 ? (
+          <div className="rounded-lg border border-dashed p-10 text-center">
+            <p className="text-sm text-muted-foreground">No documents yet.</p>
+            <Button
+              variant="link"
+              className="mt-1 px-0"
+              onClick={createDocument}
+              disabled={loading}
+            >
+              Create your first document
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="mb-3 px-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Your documents
+            </div>
+
+            {documents.map((doc) => (
+              <Link
+                key={doc.id}
+                href={`/documents/${doc.id}`}
+                className="block"
+              >
+                <Card className="transition-colors hover:bg-accent/50">
+                  <CardHeader className="flex flex-row items-center justify-between gap-6 py-4">
+                    <div className="min-w-0">
+                      <CardTitle className="truncate text-base font-medium">
+                        {doc.title}
+                      </CardTitle>
+
+                      <CardDescription className="mt-1">
+                        Owned by {doc.owner_name}
+                      </CardDescription>
+                    </div>
+
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {new Date(doc.updated_at).toLocaleDateString()}
+                    </span>
+                  </CardHeader>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </main>
   );
 }

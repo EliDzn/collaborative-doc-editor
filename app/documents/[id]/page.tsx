@@ -110,113 +110,167 @@ export default function DocumentPage() {
   if (notFound)
     return (
       <div className="p-8 text-[16px]">
-        Document not found, or you don't have access.
+        Document not found, or you do not have access.
       </div>
     );
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10">
-      <Link
-        href="/"
-        className="text-[13px] text-muted-foreground hover:underline"
-      >
-        ← Back to documents
-      </Link>
+    <main className="min-h-screen">
+      <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+        <div className="grid grid-cols-1 gap-y-6 md:grid-cols-12 md:gap-x-6 lg:gap-x-8">
+          {/* Header */}
+          <div className="md:col-span-12">
+            <div className="flex items-center justify-between">
+              <Link
+                href="/"
+                className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+              >
+                ← Back to documents
+              </Link>
 
-      <div className="flex items-center justify-between mt-4 mb-1">
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="text-[29px] font-semibold border-none px-0 h-auto focus-visible:ring-0 tracking-tight"
-        />
-        <span className="text-[13px] text-muted-foreground whitespace-nowrap ml-4">
-          {saveState === "saving"
-            ? "Saving..."
-            : saveState === "saved"
-              ? "Saved"
-              : ""}
-        </span>
-      </div>
+              <span className="text-[13px] text-muted-foreground">
+                {saveState === "saving"
+                  ? "Saving..."
+                  : saveState === "saved"
+                    ? "Saved"
+                    : ""}
+              </span>
+            </div>
+          </div>
 
-      <p className="text-[13px] text-muted-foreground mb-5">
-        {doc?.is_owner ? "Owned by you" : `Shared by ${doc?.owner_name}`}
-        {doc?.updated_by_name && ` · Last edited by ${doc.updated_by_name}`}
-      </p>
-
-      <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
-        <div className="flex items-center gap-1 border rounded-md p-1 bg-muted/40">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => insertSyntax("**", "**")}
-            className="font-bold"
-          >
-            B
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => insertSyntax("*", "*")}
-            className="italic"
-          >
-            I
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => insertSyntax("<u>", "</u>")}
-            className="underline"
-          >
-            U
-          </Button>
-          <div className="w-px h-5 bg-border mx-1" />
-          <Button variant="ghost" size="sm" onClick={() => insertSyntax("## ")}>
-            H
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => insertSyntax("- ")}>
-            • List
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => insertSyntax("1. ")}>
-            1. List
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => insertSyntax("[", "](url)")}
-          >
-            Link
-          </Button>
-          <div className="w-px h-5 bg-border mx-1" />
-          <label className="text-[13px] px-2 py-1.5 rounded cursor-pointer hover:bg-accent">
-            Upload
-            <input
-              type="file"
-              accept=".txt,.md"
-              onChange={handleFileUpload}
-              className="hidden"
+          {/* Document heading */}
+          <div className="md:col-span-9">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="h-auto border-none px-0 text-[30px] font-semibold tracking-tight shadow-none focus-visible:ring-0"
             />
-          </label>
-        </div>
 
-        {doc?.is_owner && (
-          <Button onClick={shareDocument} className="shrink-0">
-            Share document
-          </Button>
-        )}
-      </div>
+            <p className="mt-2 text-[13px] text-muted-foreground">
+              {doc?.is_owner ? "Owned by you" : `Shared by ${doc?.owner_name}`}
+              {doc?.updated_by_name &&
+                ` · Last edited by ${doc.updated_by_name}`}
+            </p>
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <textarea
-          id="editor"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="w-full min-h-[400px] border rounded-md p-4 text-[16px] leading-relaxed font-mono resize-none focus:outline-none focus:ring-1 focus:ring-ring"
-          placeholder="Start writing... use the toolbar or markdown syntax directly"
-        />
-        <div className="w-full min-h-[400px] border rounded-md p-4 text-[16px] leading-relaxed prose prose-sm max-w-none overflow-auto">
-          <ReactMarkdown>{content || "*Preview appears here*"}</ReactMarkdown>
+          {/* Document action */}
+          <div className="flex items-start justify-end md:col-span-3">
+            {doc?.is_owner && (
+              <Button onClick={shareDocument}>Share document</Button>
+            )}
+          </div>
+
+          {/* Toolbar */}
+          <div className="md:col-span-12">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-y py-2">
+              <div className="flex flex-wrap items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => insertSyntax("**", "**")}
+                  className="font-bold"
+                >
+                  B
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => insertSyntax("*", "*")}
+                  className="italic"
+                >
+                  I
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => insertSyntax("<u>", "</u>")}
+                  className="underline"
+                >
+                  U
+                </Button>
+
+                <div className="mx-1 h-5 w-px bg-border" />
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => insertSyntax("## ")}
+                >
+                  H
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => insertSyntax("- ")}
+                >
+                  • List
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => insertSyntax("1. ")}
+                >
+                  1. List
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => insertSyntax("[", "](url)")}
+                >
+                  Link
+                </Button>
+
+                <div className="mx-1 h-5 w-px bg-border" />
+
+                <label className="cursor-pointer rounded-md px-3 py-1.5 text-sm transition-colors hover:bg-accent">
+                  Upload
+                  <input
+                    type="file"
+                    accept=".txt,.md"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Editor */}
+          <section className="md:col-span-8">
+            <div className="overflow-hidden rounded-lg border bg-background">
+              <textarea
+                id="editor"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className="min-h-[600px] w-full resize-none border-0 bg-transparent p-6 text-[16px] leading-7 font-mono focus:outline-none focus:ring-0"
+                placeholder="Start writing..."
+              />
+            </div>
+          </section>
+
+          {/* Preview */}
+          <section className="md:col-span-4">
+            <div className="sticky top-6 overflow-hidden rounded-lg border bg-muted/20">
+              <div className="border-b px-4 py-3">
+                <p className="text-[13px] font-medium">Preview</p>
+              </div>
+
+              <div className="min-h-[600px] max-h-[600px] overflow-auto p-6">
+                <div className="prose prose-sm max-w-none">
+                  <ReactMarkdown>
+                    {content || "*Preview appears here*"}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
