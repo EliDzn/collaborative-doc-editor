@@ -2,11 +2,19 @@ import { sql } from "@vercel/postgres";
 
 export async function getDocuments(userId: number) {
   const { rows } = await sql`
-    SELECT d.*, u.name as owner_name
+    SELECT
+      d.id,
+      d.title,
+      d.updated_at,
+      owner.name AS owner_name,
+      (d.owner_id = ${userId}) AS is_owner
     FROM documents d
-    JOIN users u ON d.owner_id = u.id
+    JOIN users owner ON owner.id = d.owner_id
     WHERE d.owner_id = ${userId}
-       OR d.id IN (SELECT document_id FROM shares WHERE user_id = ${userId})
+       OR EXISTS (
+         SELECT 1 FROM shares s
+         WHERE s.document_id = d.id AND s.user_id = ${userId}
+       )
     ORDER BY d.updated_at DESC
   `;
   return rows;

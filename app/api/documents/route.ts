@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDocuments, createDocument } from "@/lib/db";
 
-// Temporary: userId passed via query param until we build the user selector UI.
-// e.g. GET /api/documents?userId=1
-
 export async function GET(req: NextRequest) {
   const userId = Number(req.nextUrl.searchParams.get("userId"));
   if (!userId) {

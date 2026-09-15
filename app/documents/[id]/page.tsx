@@ -20,7 +20,7 @@ type Document = {
 export default function DocumentPage() {
   const params = useParams();
   const id = params.id as string;
-  const currentUserId = 1;
+  const currentUserId = 2;
 
   const [doc, setDoc] = useState<Document | null>(null);
   const [title, setTitle] = useState("");
@@ -82,6 +82,18 @@ export default function DocumentPage() {
     setTimeout(() => textarea.focus(), 0);
   }
 
+  function insertAtCursor(text: string) {
+    const textarea = document.getElementById("editor") as HTMLTextAreaElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const newContent = content.slice(0, start) + text + content.slice(end);
+    setContent(newContent);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = start + text.length;
+    }, 0);
+  }
+
   async function shareDocument() {
     await fetch(`/api/documents/${id}/share`, {
       method: "POST",
@@ -102,7 +114,7 @@ export default function DocumentPage() {
       alert(data.error);
       return;
     }
-    setContent((prev) => prev + "\n\n" + data.content);
+    insertAtCursor(data.content);
     e.target.value = "";
   }
 
@@ -140,10 +152,12 @@ export default function DocumentPage() {
 
           {/* Document heading */}
           <div className="md:col-span-9">
+            <h1 className="sr-only">{title || "Untitled Document"}</h1>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="h-auto border-none px-0 text-[30px] font-semibold tracking-tight shadow-none focus-visible:ring-0"
+              aria-label="Document title"
+              className="h-auto border-none px-0 !text-3xl !font-semibold tracking-tight shadow-none focus-visible:ring-0"
             />
 
             <p className="mt-2 text-[13px] text-muted-foreground">
@@ -227,15 +241,20 @@ export default function DocumentPage() {
 
                 <div className="mx-1 h-5 w-px bg-border" />
 
-                <label className="cursor-pointer rounded-md px-3 py-1.5 text-sm transition-colors hover:bg-accent">
-                  Upload
-                  <input
-                    type="file"
-                    accept=".txt,.md"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer rounded-md px-3 py-1.5 text-sm transition-colors hover:bg-accent">
+                    Upload
+                    <input
+                      type="file"
+                      accept=".txt,.md"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  <span className="text-[11px] text-muted-foreground">
+                    .txt or .md only
+                  </span>
+                </div>
               </div>
             </div>
           </div>

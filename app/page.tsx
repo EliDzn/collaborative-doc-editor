@@ -16,6 +16,7 @@ type Document = {
   title: string;
   owner_name: string;
   updated_at: string;
+  is_owner: boolean;
 };
 
 export default function Home() {
@@ -93,12 +94,22 @@ export default function Home() {
                 <Card className="transition-colors hover:bg-accent/50">
                   <CardHeader className="flex flex-row items-center justify-between gap-6 py-4">
                     <div className="min-w-0">
-                      <CardTitle className="truncate text-base font-medium">
-                        {doc.title}
-                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="truncate text-base font-medium">
+                          {doc.title}
+                        </CardTitle>
+
+                        {!doc.is_owner && (
+                          <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-[11px] text-muted-foreground">
+                            Shared with you
+                          </span>
+                        )}
+                      </div>
 
                       <CardDescription className="mt-1">
-                        Owned by {doc.owner_name}
+                        {doc.is_owner
+                          ? "Owned by you"
+                          : `Shared by ${doc.owner_name}`}
                       </CardDescription>
                     </div>
 
